@@ -50,7 +50,7 @@ docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
 docker run -d \
   --name "$CONTAINER" \
   --restart unless-stopped \
-  -p "127.0.0.1:${PORT}:3000" \
+  -p "${PORT}:3000" \
   -v "${VOLUME}:/data" \
   --env-file "$ENV_FILE" \
   "$IMAGE"
