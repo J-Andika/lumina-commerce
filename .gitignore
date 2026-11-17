@@ -36,3 +36,17 @@ yarn-error.log*
 .vercel
 .turbo
 tsconfig.tsbuildinfo
+
+/src/generated/prisma
+
+# prisma
+src/generated/
+prisma/*.db
+prisma/*.db-journal
+
+# agent/tooling artifacts
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
+*.log
