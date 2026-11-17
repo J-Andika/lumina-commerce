@@ -1,0 +1,15 @@
+.git
+.github
+node_modules
+.next
+out
+coverage
+test-results
+playwright-report
+*.db
+*.sqlite
+.env
+.env.local
+.env.*.local
+README.md
+docs
