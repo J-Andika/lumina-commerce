@@ -8,7 +8,7 @@ Storefront headless dengan bentuk produksi: frontend Next.js App Router yang ber
 commerce API buatan sendiri (Route Handlers + Prisma), checkout Stripe test mode yang benar-benar
 jalan, order tersimpan di database, dan admin yang bisa dipakai.
 
-> **Status:** tahap 1 dari 11 selesai (scaffold, CI, Docker).
+> **Status:** tahap 2 dari 11 selesai (katalog 14 produk dilayani dari SQLite).
 > Preview sandbox (ephemeral): <https://3000-001m7ma0xxphbkbh4k9qkh2a3x1.sbx.sandboxes-cloud.docker.com>
 > — bisa mati kalau sandbox di-stop. Link permanen menyusul di tahap 10.
 
@@ -73,7 +73,7 @@ Ringkasnya: `main` selalu bisa di-build, semua perubahan lewat PR, CI wajib hija
 ## Roadmap
 
 - [x] Tahap 1 — scaffold, design token, CI
-- [ ] Tahap 2 — skema Prisma + seed katalog
+- [x] Tahap 2 — skema Prisma, seed katalog, katalog dari database
 - [ ] Tahap 3 — domain harga / promo / cart + unit test
 - [ ] Tahap 4 — storefront + filter berbasis URL
 - [ ] Tahap 5 — halaman produk + JSON-LD

@@ -1,3 +1,5 @@
+import pkg from "../../../../package.json";
+
 export function GET() {
-  return Response.json({ ok: true, version: "0.1.0", ts: new Date().toISOString() });
+  return Response.json({ ok: true, version: pkg.version, ts: new Date().toISOString() });
 }
