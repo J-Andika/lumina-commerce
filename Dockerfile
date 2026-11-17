@@ -17,9 +17,7 @@ RUN npm rebuild better-sqlite3 \
 FROM node:24-bookworm-slim AS migrator
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json package-lock.json prisma7.config.ts ./
-COPY prisma ./prisma
+COPY --from=builder /app ./
 CMD ["npx", "prisma", "migrate", "deploy"]
 
 FROM node:24-bookworm-slim AS runner

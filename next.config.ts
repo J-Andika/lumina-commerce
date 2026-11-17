@@ -3,7 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   images: {
-    formats: ["image/avif", "image/webp"],
+    // Assets are already AVIF/WebP at the right dimensions; skipping the runtime
+    // optimiser keeps the container free of a native image pipeline.
+    unoptimized: true,
   },
   poweredByHeader: false,
   outputFileTracingIncludes: {

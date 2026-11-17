@@ -17,7 +17,7 @@ export type CatalogFilters = {
 
 const CARD_INCLUDE = {
   images: { orderBy: { position: "asc" }, take: 1 },
-  variants: { orderBy: { priceCents: "asc" }, take: 1 },
+  variants: { orderBy: { priceCents: "asc" }, select: { priceCents: true, stock: true } },
 } as const;
 
 export type CatalogProduct = Awaited<ReturnType<typeof listProducts>>[number];
