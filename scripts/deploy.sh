@@ -42,8 +42,18 @@ EOF
   echo "created $ENV_FILE (admin password stored there)"
 fi
 
-echo "==> build"
-docker build -t "$IMAGE" "$APP_DIR"
+echo "==> build app"
+docker build --target runner -t "$IMAGE" "$APP_DIR"
+
+echo "==> build migrator"
+docker build --target migrator -t "${IMAGE%:*}-migrator:latest" "$APP_DIR"
+
+echo "==> migrate + seed"
+docker run --rm \
+  -v "${VOLUME}:/data" \
+  --env-file "$ENV_FILE" \
+  "${IMAGE%:*}-migrator:latest" \
+  sh -lc "npx prisma migrate deploy && npx tsx prisma/seed.ts"
 
 echo "==> restart"
 docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
