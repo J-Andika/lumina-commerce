@@ -3,15 +3,19 @@
 FROM node:24-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts
+# The schema must be present before install: the postinstall script runs
+# `prisma generate`, and better-sqlite3's install script fetches its prebuilt
+# binding (npm rebuild would force a source compile and fail without toolchain).
+COPY prisma ./prisma
+COPY prisma7.config.ts ./
+RUN npm ci
 
 FROM node:24-bookworm-slim AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm rebuild better-sqlite3 \
- && npx prisma generate \
+RUN npx prisma generate \
  && npm run build
 
 FROM node:24-bookworm-slim AS migrator
