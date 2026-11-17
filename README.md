@@ -6,8 +6,9 @@ A production-shaped headless commerce storefront: a Next.js App Router frontend 
 purpose-built commerce API (Route Handlers + Prisma), with real Stripe test-mode checkout,
 persistent orders, and an operational admin.
 
-> **Status:** in development — stage 1 of 11 (scaffold + design tokens).
-> Live demo URL will be published here once checkout and admin are functional.
+> **Status:** in development — stage 1 of 11 complete (scaffold, CI, Docker).
+> Sandbox preview (ephemeral): <https://3000-001m7ma0xxphbkbh4k9qkh2a3x1.sbx.sandboxes-cloud.docker.com>
+> — it may be offline when the sandbox is stopped; the permanent link lands in stage 10.
 
 ## What this is
 
@@ -50,6 +51,10 @@ npm run typecheck   # next typegen && tsc --noEmit
 npm run test        # vitest
 npm run build       # production build
 ```
+
+## Development workflow
+
+Branch, commit, PR, and deploy rules: [docs/workflow.md](./docs/workflow.md).
 
 ## Roadmap
 
