@@ -2,40 +2,42 @@
 
 [![CI](https://github.com/J-Andika/lumina-commerce/actions/workflows/ci.yml/badge.svg)](https://github.com/J-Andika/lumina-commerce/actions/workflows/ci.yml)
 
-A production-shaped headless commerce storefront: a Next.js App Router frontend talking to a
-purpose-built commerce API (Route Handlers + Prisma), with real Stripe test-mode checkout,
-persistent orders, and an operational admin.
+**Bahasa:** Indonesia · [English](./README.en.md)
 
-> **Status:** in development — stage 1 of 11 complete (scaffold, CI, Docker).
-> Sandbox preview (ephemeral): <https://3000-001m7ma0xxphbkbh4k9qkh2a3x1.sbx.sandboxes-cloud.docker.com>
-> — it may be offline when the sandbox is stopped; the permanent link lands in stage 10.
+Storefront headless dengan bentuk produksi: frontend Next.js App Router yang berbicara ke
+commerce API buatan sendiri (Route Handlers + Prisma), checkout Stripe test mode yang benar-benar
+jalan, order tersimpan di database, dan admin yang bisa dipakai.
 
-## What this is
+> **Status:** tahap 1 dari 11 selesai (scaffold, CI, Docker).
+> Preview sandbox (ephemeral): <https://3000-001m7ma0xxphbkbh4k9qkh2a3x1.sbx.sandboxes-cloud.docker.com>
+> — bisa mati kalau sandbox di-stop. Link permanen menyusul di tahap 10.
 
-- A custom storefront (catalog, faceted filtering, product pages, cart, checkout, receipt)
-- A commerce backend in the same deploy: server-side pricing, stock, promo codes, orders
-- An admin surface: today's orders, stock toggles, order status
+## Apa isi proyek ini
 
-## What this is not
+- **Storefront kustom** — katalog, filter multi-facet, halaman produk, cart, checkout, receipt
+- **Commerce backend di deploy yang sama** — harga, diskon, ongkir, dan stok dihitung di server
+- **Admin operasional** — order hari ini, toggle stok, ubah status order
 
-- Not a Shopify headless build — the commerce engine here is purpose-built (see `docs/architecture.md`)
-- No real payments (Stripe **test mode** only), no customer accounts, no email delivery
-- No multi-currency, no regional tax, no shipping-carrier integration
+## Yang sengaja tidak ada
 
-## Stack
+- Bukan build Shopify headless — commerce engine di sini ditulis sendiri (lihat [docs/architecture.md](./docs/architecture.md))
+- Tidak ada pembayaran nyata (hanya **Stripe test mode**), tidak ada akun customer, tidak ada email transaksional
+- Tidak ada multi-currency, pajak per region, atau integrasi kurir
 
-| Layer | Choice |
-|---|---|
-| Framework | Next.js 16 (App Router, RSC, Server Actions) |
-| Language | TypeScript (strict) |
-| Styling | Tailwind CSS v4 (`@tailwindcss/postcss`) |
-| Primitives | Radix UI (headless) |
-| Data | Prisma + SQLite |
-| Payments | Stripe test mode (+ local sandbox mode) |
-| Tests | Vitest, Playwright |
-| Runtime | Docker (multi-stage, `node:24-alpine`, standalone) |
+## Stack dan alasannya
 
-## Run locally
+| Layer | Pilihan | Alasan |
+|---|---|---|
+| Framework | Next.js 16 (App Router, RSC, Server Actions) | Standar pasar; data dibaca di server, bukan fetch dari client |
+| Bahasa | TypeScript strict | Harga, stok, dan order tidak boleh longgar tipenya |
+| Styling | Tailwind CSS v4 (`@tailwindcss/postcss`) | Setup resmi Next 16, token desain terpusat |
+| Komponen dasar | Radix UI (headless) | Focus trap dan aria gratis; styling tetap custom |
+| Data | Prisma + SQLite | Nol ops untuk deploy satu container; mudah diganti Postgres |
+| Pembayaran | Stripe test mode + mode sandbox lokal | Integrasi nyata tanpa KYC; demo tetap hidup kalau key dicabut |
+| Test | Vitest, Playwright | Unit untuk logika uang/promo, E2E untuk alur belanja |
+| Runtime | Docker multi-stage (`node:24-alpine`, standalone) | Image kecil, jalan sebagai non-root, healthcheck aktif |
+
+## Jalankan di lokal
 
 ```bash
 npm ci
@@ -43,33 +45,45 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000.
+Buka http://localhost:3000.
 
 ```bash
 npm run lint        # eslint
 npm run typecheck   # next typegen && tsc --noEmit
 npm run test        # vitest
-npm run build       # production build
+npm run build       # build produksi
 ```
 
-## Development workflow
+## Struktur proyek
 
-Branch, commit, PR, and deploy rules: [docs/workflow.md](./docs/workflow.md).
+```
+src/app          route & layout (server components)
+src/components   client islands (cart, checkout, toggle tema)
+src/lib          domain: uang, harga, promo, cart
+src/data         katalog placeholder — diganti Prisma di tahap 2
+docs/            arsitektur, workflow, runbook deploy
+scripts/         deploy.sh + boot.sh untuk sandbox
+```
+
+## Alur kerja
+
+Aturan branch, commit, PR, dan deploy ada di [docs/workflow.md](./docs/workflow.md).
+Ringkasnya: `main` selalu bisa di-build, semua perubahan lewat PR, CI wajib hijau, merge squash.
 
 ## Roadmap
 
-- [x] Stage 1 — scaffold, design tokens, CI
-- [ ] Stage 2 — Prisma schema + seed catalog
-- [ ] Stage 3 — pricing / promo / cart domain + unit tests
-- [ ] Stage 4 — storefront + URL-state filtering
-- [ ] Stage 5 — product pages + JSON-LD
-- [ ] Stage 6 — cart drawer, promo engine, wishlist, search
-- [ ] Stage 7 — checkout, Stripe test mode, receipt
-- [ ] Stage 8 — admin (Basic Auth), stock + order actions
-- [ ] Stage 9 — E2E, a11y, performance budget
-- [ ] Stage 10 — Docker deploy, backups, uptime check
-- [ ] Stage 11 — packaging: README, video, gig assets
+- [x] Tahap 1 — scaffold, design token, CI
+- [ ] Tahap 2 — skema Prisma + seed katalog
+- [ ] Tahap 3 — domain harga / promo / cart + unit test
+- [ ] Tahap 4 — storefront + filter berbasis URL
+- [ ] Tahap 5 — halaman produk + JSON-LD
+- [ ] Tahap 6 — cart drawer, promo engine, wishlist, search
+- [ ] Tahap 7 — checkout, Stripe test mode, receipt
+- [ ] Tahap 8 — admin (Basic Auth), aksi stok + status order
+- [ ] Tahap 9 — E2E, a11y, budget performa
+- [ ] Tahap 10 — deploy Docker, backup, uptime check
+- [ ] Tahap 11 — packaging: README, video, aset gig
 
-## License
+## Lisensi
 
-MIT — see [LICENSE](./LICENSE).
+MIT — lihat [LICENSE](./LICENSE).
