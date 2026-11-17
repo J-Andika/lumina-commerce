@@ -2,6 +2,13 @@
 
 FROM node:24-bookworm-slim AS deps
 WORKDIR /app
+# better-sqlite3 ships prebuilds, but when the download is unavailable in a
+# sandboxed build it falls back to node-gyp; keep a compiler in the throwaway
+# deps stage so the build never depends on a CDN.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 make g++ ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY package.json package-lock.json ./
 # The schema must be present before install: the postinstall script runs
 # `prisma generate`, and better-sqlite3's install script fetches its prebuilt
