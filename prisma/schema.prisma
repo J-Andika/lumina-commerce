@@ -1,0 +1,128 @@
+// Lumina Commerce — commerce domain
+// Money is always integer cents. Status fields are strings because SQLite has no enums;
+// the TypeScript unions live in src/server/types.ts and are validated at the domain edge.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Product {
+  id          String         @id @default(cuid())
+  slug        String         @unique
+  name        String
+  tagline     String
+  description String
+  category    String
+  badge       String?
+  featured    Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  variants    Variant[]
+  images      ProductImage[]
+  reviews     Review[]
+
+  @@index([category])
+  @@index([featured])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String
+  width     Int
+  height    Int
+  position  Int
+
+  @@unique([productId, position])
+}
+
+model Variant {
+  id         String      @id @default(cuid())
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku        String      @unique
+  name       String
+  priceCents Int
+  stock      Int         @default(0)
+  colorHex   String?
+  createdAt  DateTime    @default(now())
+  orderItems OrderItem[]
+
+  @@index([productId])
+  @@index([stock])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  author    String
+  rating    Int
+  title     String?
+  body      String
+  verified  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([rating])
+}
+
+model PromoCode {
+  id               String    @id @default(cuid())
+  code             String    @unique
+  type             String
+  value            Int
+  minSubtotalCents Int       @default(0)
+  maxDiscountCents Int?
+  maxUses          Int?
+  usedCount        Int       @default(0)
+  active           Boolean   @default(true)
+  expiresAt        DateTime?
+  createdAt        DateTime  @default(now())
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  number                String      @unique
+  status                String      @default("PENDING")
+  email                 String
+  name                  String
+  address1              String
+  city                  String
+  postal                String
+  country               String
+  courier               String
+  subtotalCents         Int
+  discountCents         Int         @default(0)
+  shippingCents         Int         @default(0)
+  totalCents            Int
+  promoCode             String?
+  paymentMode           String      @default("sandbox")
+  stripePaymentIntentId String?     @unique
+  createdAt             DateTime    @default(now())
+  paidAt                DateTime?
+  items                 OrderItem[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId      String?
+  variant        Variant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  nameSnapshot   String
+  unitPriceCents Int
+  qty            Int
+
+  @@index([orderId])
+}

@@ -13,18 +13,22 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  DATABASE_URL: file:./ci.db
+
 jobs:
   quality:
     name: quality
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm run db:deploy
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
@@ -34,10 +38,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm run db:deploy
       - run: npm run build
