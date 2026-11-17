@@ -12,22 +12,28 @@ datasource db {
 }
 
 model Product {
-  id          String         @id @default(cuid())
-  slug        String         @unique
-  name        String
-  tagline     String
-  description String
-  category    String
-  badge       String?
-  featured    Boolean        @default(false)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  variants    Variant[]
-  images      ProductImage[]
-  reviews     Review[]
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  name           String
+  tagline        String
+  description    String
+  category       String
+  badge          String?
+  featured       Boolean        @default(false)
+  minPriceCents  Int            @default(0)
+  ratingAvg      Float          @default(0)
+  ratingCount    Int            @default(0)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  variants       Variant[]
+  images         ProductImage[]
+  reviews        Review[]
 
   @@index([category])
   @@index([featured])
+  @@index([minPriceCents])
+  @@index([ratingAvg])
+  @@index([ratingCount])
 }
 
 model ProductImage {

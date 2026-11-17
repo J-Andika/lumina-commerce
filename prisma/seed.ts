@@ -269,9 +269,9 @@ const products: ProductSeed[] = [
       "A machined brass keyring with a hidden slot for a coin-cell tracker and a spring gate that does not open in a pocket.",
     category: "accessories",
     variants: [
-      { name: "Brass", sku: "ORB-BRS", priceCents: 5900, stock: 21, colorHex: "#b08d57" },
-      { name: "Steel", sku: "ORB-STL", priceCents: 5900, stock: 3, colorHex: "#a1a1aa" },
-      { name: "Black", sku: "ORB-BLK", priceCents: 5900, stock: 14, colorHex: "#18181b" },
+      { name: "Brass", sku: "ORB-BRS", priceCents: 5900, stock: 0, colorHex: "#b08d57" },
+      { name: "Steel", sku: "ORB-STL", priceCents: 5900, stock: 0, colorHex: "#a1a1aa" },
+      { name: "Black", sku: "ORB-BLK", priceCents: 5900, stock: 0, colorHex: "#18181b" },
     ],
     reviews: [
       { author: "Bayu A.", rating: 5, title: "Heavy in the right way", body: "Tracker slot is hidden well. Gate has not opened once." },
@@ -297,6 +297,12 @@ async function main() {
   }
 
   for (const item of products) {
+    const minPriceCents = Math.min(...item.variants.map((variant) => variant.priceCents));
+    const ratingCount = item.reviews.length;
+    const ratingAvg = ratingCount
+      ? item.reviews.reduce((total, review) => total + review.rating, 0) / ratingCount
+      : 0;
+
     const product = await db.product.upsert({
       where: { slug: item.slug },
       create: {
@@ -307,6 +313,9 @@ async function main() {
         category: item.category,
         badge: item.badge ?? null,
         featured: item.featured ?? false,
+        minPriceCents,
+        ratingAvg,
+        ratingCount,
       },
       update: {
         name: item.name,
@@ -315,6 +324,9 @@ async function main() {
         category: item.category,
         badge: item.badge ?? null,
         featured: item.featured ?? false,
+        minPriceCents,
+        ratingAvg,
+        ratingCount,
       },
     });
 

@@ -16,6 +16,19 @@ Living document. Updated whenever a structural decision changes.
 3. `main` is always buildable and deployable.
 4. No secret ever reaches the client bundle.
 
+## Schema changes
+
+Prisma 7 does not regenerate the client on `migrate dev`, so the order is:
+
+```bash
+npx prisma migrate dev --name <change>
+npx prisma generate
+npm run db:seed
+```
+
+CI runs `prisma migrate deploy` on a throwaway database before lint/typecheck/tests.
+Tests use their own file (`prisma/test.db`) created by `src/server/testing/global-setup.ts`.
+
 ## Decisions log
 
 | Date | Decision | Why |
