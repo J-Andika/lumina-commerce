@@ -1,14 +1,39 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ProductDetail } from "@/components/product-detail";
 import { SiteHeader } from "@/components/site-header";
 import { formatMoney } from "@/lib/money";
+import { pickDefaultVariant, priceRange } from "@/lib/product-view";
 import { getProductBySlug } from "@/server/catalog";
 
 export const dynamic = "force-dynamic";
 
 type Params = { slug: string };
+
+const SPECS: Record<string, Array<{ label: string; value: string }>> = {
+  audio: [
+    { label: "Warranty", value: "2 years, parts and labour" },
+    { label: "In the box", value: "Product, braided cable, travel case" },
+    { label: "Service", value: "Replaceable pads and cable" },
+  ],
+  workspace: [
+    { label: "Warranty", value: "5 years on machined parts" },
+    { label: "Finish", value: "Anodised aluminium or full-grain leather" },
+    { label: "Care", value: "Wipe with a dry cloth; leather ages deliberately" },
+  ],
+  accessories: [
+    { label: "Warranty", value: "1 year on hardware" },
+    { label: "Materials", value: "Waxed canvas, brass, braided nylon" },
+    { label: "Service", value: "Repair-first, no glued assemblies" },
+  ],
+};
+
+const SHIPPING = [
+  { label: "Standard", value: "$8 — 5 to 7 business days" },
+  { label: "Express", value: "$18 — 2 to 3 business days" },
+  { label: "Free shipping", value: "Orders $100 and up, after discount" },
+];
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
@@ -18,7 +43,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
 
   return {
     title: product.name,
-    description: `${product.tagline} — from ${formatMoney(product.minPriceCents)}`,
+    description: `${product.tagline} — from ${formatMoney(product.minPriceCents)}. ${product.description}`,
+    openGraph: {
+      title: `${product.name} · Lumina`,
+      description: product.tagline,
+      type: "website",
+    },
   };
 }
 
@@ -28,8 +58,18 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
   if (!product) notFound();
 
-  const stock = product.variants.reduce((total, variant) => total + variant.stock, 0);
-  const soldOut = stock === 0;
+  const variants = product.variants.map((variant) => ({
+    id: variant.id,
+    name: variant.name,
+    priceCents: variant.priceCents,
+    stock: variant.stock,
+    colorHex: variant.colorHex,
+  }));
+  const initial = pickDefaultVariant(variants);
+  const range = priceRange(variants);
+  const totalReviews = product.reviews.length;
+  const maxBucket = Math.max(1, ...product.ratingDistribution.map((bucket) => bucket.count));
+  const specs = SPECS[product.category] ?? SPECS.accessories;
 
   return (
     <div className="min-h-dvh">
@@ -48,102 +88,128 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           <span className="text-foreground">{product.name}</span>
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="grid gap-3 sm:grid-cols-2">
-            {product.images.map((image, index) => (
-              <div
-                key={image.id}
-                className={`relative overflow-hidden border border-hairline bg-surface-2 ${
-                  index === 0 ? "sm:col-span-2 aspect-[4/5]" : "aspect-square"
-                }`}
-              >
-                <Image
-                  src={image.url}
-                  alt={image.alt}
-                  fill
-                  unoptimized
-                  priority={index === 0}
-                  sizes={index === 0 ? "(min-width: 1024px) 55vw, 100vw" : "(min-width: 1024px) 27vw, 50vw"}
-                  className="object-cover"
-                />
-              </div>
-            ))}
+        <div className="mb-8">
+          <p className="font-mono text-[11px] tracking-[0.2em] text-muted uppercase">
+            {product.category}
+            {product.badge ? ` · ${product.badge}` : ""}
+          </p>
+          <h1 className="mt-2 font-display text-4xl tracking-tight sm:text-5xl">{product.name}</h1>
+          <p className="mt-2 text-sm text-muted">{product.tagline}</p>
+          {product.ratingCount > 0 ? (
+            <p className="mt-2 font-mono text-xs text-muted">
+              {product.ratingAvg.toFixed(1)} ★ · {product.ratingCount} reviews
+            </p>
+          ) : null}
+        </div>
+
+        <ProductDetail
+          productName={product.name}
+          images={product.images.map((image) => ({ id: image.id, url: image.url, alt: image.alt }))}
+          variants={variants}
+          initialVariantId={initial?.id ?? null}
+        />
+
+        <section className="mt-14 grid gap-10 lg:grid-cols-2">
+          <div>
+            <h2 className="font-mono text-[11px] tracking-widest uppercase">About</h2>
+            <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">{product.description}</p>
+            <p className="mt-4 font-mono text-xs text-muted">
+              {range
+                ? `Range ${formatMoney(range.minCents)}${
+                    range.maxCents !== range.minCents ? ` – ${formatMoney(range.maxCents)}` : ""
+                  } · ${variants.length} variants`
+                : "No variants"}
+            </p>
           </div>
 
-          <div>
-            <p className="font-mono text-[11px] tracking-[0.2em] text-muted uppercase">
-              {product.category}
-              {product.badge ? ` · ${product.badge}` : ""}
-            </p>
-            <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">{product.name}</h1>
-            <p className="mt-2 text-sm text-muted">{product.tagline}</p>
-
-            <div className="mt-6 flex items-baseline gap-3">
-              <p className="font-mono text-2xl tabular-nums">{formatMoney(product.minPriceCents)}</p>
-              <span className="font-mono text-xs text-muted">
-                {product.ratingCount > 0
-                  ? `${product.ratingAvg.toFixed(1)} ★ · ${product.ratingCount} reviews`
-                  : "No reviews yet"}
-              </span>
-            </div>
-
-            <p className="mt-4 font-mono text-xs tracking-widest uppercase">
-              {soldOut ? (
-                <span className="text-muted">Sold out</span>
-              ) : stock <= 3 ? (
-                <span className="text-accent">Only {stock} left</span>
-              ) : (
-                <span className="text-muted">In stock</span>
-              )}
-            </p>
-
-            <p className="mt-6 max-w-prose text-sm leading-relaxed text-muted">{product.description}</p>
-
-            <div className="mt-8 border-t border-hairline pt-4">
-              <p className="font-mono text-[11px] tracking-widest text-muted uppercase">
-                Variants and add-to-cart arrive in stage 5
-              </p>
-              <ul className="mt-3 space-y-1 text-sm">
-                {product.variants.map((variant) => (
-                  <li key={variant.id} className="flex justify-between gap-4 text-muted">
-                    <span>{variant.name}</span>
-                    <span className="font-mono tabular-nums">
-                      {formatMoney(variant.priceCents)}
-                      {variant.stock === 0 ? " · sold out" : ""}
-                    </span>
-                  </li>
+          <div className="space-y-3">
+            <details open className="border border-hairline">
+              <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] tracking-widest uppercase">
+                Specifications
+              </summary>
+              <dl className="space-y-2 px-4 pb-4 text-sm">
+                {specs.map((spec) => (
+                  <div key={spec.label} className="flex justify-between gap-6">
+                    <dt className="text-muted">{spec.label}</dt>
+                    <dd className="text-right">{spec.value}</dd>
+                  </div>
                 ))}
-              </ul>
-            </div>
+              </dl>
+            </details>
 
-            {product.reviews.length > 0 ? (
-              <div className="mt-8 border-t border-hairline pt-4">
-                <h2 className="font-mono text-[11px] tracking-widest uppercase">Reviews</h2>
-                <ul className="mt-3 space-y-3">
-                  {product.reviews.slice(0, 2).map((review) => (
-                    <li key={review.id} className="text-sm">
-                      <p className="font-mono text-xs text-muted">
-                        {review.rating}/5 · {review.author}
-                        {review.verified ? " · verified" : ""}
-                      </p>
-                      <p className="mt-1 text-muted">
-                        {review.title ? <strong className="text-foreground">{review.title}. </strong> : null}
-                        {review.body}
-                      </p>
+            <details className="border border-hairline">
+              <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] tracking-widest uppercase">
+                Shipping &amp; returns
+              </summary>
+              <dl className="space-y-2 px-4 pb-4 text-sm">
+                {SHIPPING.map((row) => (
+                  <div key={row.label} className="flex justify-between gap-6">
+                    <dt className="text-muted">{row.label}</dt>
+                    <dd className="text-right">{row.value}</dd>
+                  </div>
+                ))}
+                <div className="flex justify-between gap-6">
+                  <dt className="text-muted">Returns</dt>
+                  <dd className="text-right">30 days, unopened</dd>
+                </div>
+              </dl>
+            </details>
+          </div>
+        </section>
+
+        <section aria-labelledby="reviews-heading" className="mt-14 border-t border-hairline pt-8">
+          <h2 id="reviews-heading" className="font-display text-2xl">
+            Reviews
+          </h2>
+
+          {totalReviews === 0 ? (
+            <p className="mt-3 text-sm text-muted">No reviews yet.</p>
+          ) : (
+            <div className="mt-6 grid gap-10 lg:grid-cols-[280px_1fr]">
+              <div>
+                <p className="font-mono text-4xl tabular-nums">{product.ratingAvg.toFixed(1)}</p>
+                <p className="mt-1 text-xs text-muted">{totalReviews} verified reviews</p>
+
+                <ul className="mt-4 space-y-1" aria-label="Rating distribution">
+                  {product.ratingDistribution.map((bucket) => (
+                    <li key={bucket.rating} className="flex items-center gap-3 text-xs text-muted">
+                      <span className="w-6 font-mono">{bucket.rating}★</span>
+                      <span className="h-1.5 flex-1 bg-surface-2">
+                        <span
+                          className="block h-full bg-accent"
+                          style={{ width: `${(bucket.count / maxBucket) * 100}%` }}
+                        />
+                      </span>
+                      <span className="w-6 text-right font-mono">{bucket.count}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-            ) : null}
 
-            <Link
-              href="/shop"
-              className="mt-8 inline-block border border-hairline px-4 py-2 font-mono text-xs tracking-widest text-muted uppercase transition-colors hover:text-foreground"
-            >
-              ← Back to shop
-            </Link>
-          </div>
-        </div>
+              <ul className="space-y-6">
+                {product.reviews.map((review) => (
+                  <li key={review.id} className="border-b border-hairline pb-5 last:border-0">
+                    <p className="font-mono text-xs text-muted">
+                      {review.rating}/5 · {review.author}
+                      {review.verified ? " · verified" : ""}
+                    </p>
+                    {review.title ? (
+                      <p className="mt-1 font-display text-lg">{review.title}</p>
+                    ) : null}
+                    <p className="mt-1 text-sm leading-relaxed text-muted">{review.body}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+
+        <Link
+          href="/shop"
+          className="mt-12 inline-block border border-hairline px-4 py-2 font-mono text-xs tracking-widest text-muted uppercase transition-colors hover:text-foreground"
+        >
+          ← Back to shop
+        </Link>
       </main>
     </div>
   );
