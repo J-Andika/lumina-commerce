@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product-detail";
 import { SiteHeader } from "@/components/site-header";
 import { formatMoney } from "@/lib/money";
+import { buildProductJsonLd } from "@/lib/product-jsonld";
 import { pickDefaultVariant, priceRange } from "@/lib/product-view";
 import { getProductBySlug } from "@/server/catalog";
 
@@ -70,10 +71,27 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const totalReviews = product.reviews.length;
   const maxBucket = Math.max(1, ...product.ratingDistribution.map((bucket) => bucket.count));
   const specs = SPECS[product.category] ?? SPECS.accessories;
+  const jsonLd = buildProductJsonLd({
+    name: product.name,
+    description: product.description,
+    category: product.category,
+    images: product.images.map((image) => image.url),
+    variants: product.variants.map((variant) => ({
+      priceCents: variant.priceCents,
+      stock: variant.stock,
+    })),
+    ratingAvg: product.ratingAvg,
+    ratingCount: product.ratingCount,
+  });
 
   return (
     <div className="min-h-dvh">
       <SiteHeader />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <nav aria-label="Breadcrumb" className="mb-6 font-mono text-[11px] tracking-widest text-muted uppercase">
