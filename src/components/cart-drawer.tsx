@@ -2,6 +2,7 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useStore } from "@/components/store-provider";
@@ -246,14 +247,13 @@ export function CartDrawer() {
                 </div>
               </dl>
 
-              <button
-                type="button"
-                disabled
-                title="Checkout lands in stage 7"
-                className="mt-4 w-full cursor-not-allowed border border-hairline bg-surface px-4 py-3 font-mono text-xs tracking-widest text-muted uppercase"
+              <Link
+                href="/checkout"
+                onClick={() => setCartOpen(false)}
+                className="mt-4 block w-full bg-accent px-4 py-3 text-center font-mono text-xs tracking-widest text-accent-foreground uppercase transition-opacity hover:opacity-90"
               >
-                Checkout — stage 7
-              </button>
+                Checkout
+              </Link>
               <p className="mt-2 text-center font-mono text-[10px] tracking-widest text-muted uppercase">
                 Totals re-checked on the server at checkout
               </p>
