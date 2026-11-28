@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { WishlistButton } from "@/components/wishlist-button";
 import { formatMoney } from "@/lib/money";
 import type { CatalogProduct } from "@/server/catalog";
 
@@ -48,6 +49,12 @@ export function ProductCard({ product, index, priority = false }: Props) {
               {product.badge}
             </span>
           ) : null}
+
+          <WishlistButton
+            slug={product.slug}
+            name={product.name}
+            className="absolute right-3 bottom-3 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+          />
         </div>
 
         <div className="space-y-2 p-4">

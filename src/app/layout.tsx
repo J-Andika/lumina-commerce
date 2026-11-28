@@ -3,8 +3,10 @@ import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
 import { CartDrawer } from "@/components/cart-drawer";
+import { SearchDialog } from "@/components/search-dialog";
 import { StoreProvider } from "@/components/store-provider";
 import { Toaster } from "@/components/toaster";
+import { listProducts } from "@/server/catalog";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,16 +33,26 @@ export const metadata: Metadata = {
 
 const themeScript = `try{var t=localStorage.getItem("lumina.theme");var d=t?t==="dark":true;document.documentElement.classList.toggle("dark",d);}catch(e){}`;
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const products = await listProducts({ limit: 100 });
+  const searchIndex = products.map((product) => ({
+    slug: product.slug,
+    name: product.name,
+    tagline: product.tagline,
+    category: product.category,
+    priceCents: product.minPriceCents,
+    imageUrl: product.images[0]?.url,
+  }));
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${inter.variable} ${instrumentSerif.variable}`}>
-        <StoreProvider>
+        <StoreProvider searchIndex={searchIndex}>
           {children}
           <CartDrawer />
+          <SearchDialog />
           <Toaster />
         </StoreProvider>
       </body>

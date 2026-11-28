@@ -12,6 +12,7 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import type { SearchEntry } from "@/lib/search";
 import {
   EMPTY_CART,
   cartCount,
@@ -43,6 +44,9 @@ type StoreValue = {
   wishlistCount: number;
   toggleWishlist: (slug: string) => void;
   isWishlisted: (slug: string) => boolean;
+  searchIndex: SearchEntry[];
+  searchOpen: boolean;
+  setSearchOpen: (open: boolean) => void;
   toasts: Toast[];
   pushToast: (message: string, action?: Toast["action"]) => void;
   dismissToast: (id: number) => void;
@@ -123,9 +127,16 @@ function writeWishlist(next: string[]) {
   for (const listener of wishlistListeners) listener();
 }
 
-export function StoreProvider({ children }: { children: React.ReactNode }) {
+export function StoreProvider({
+  children,
+  searchIndex,
+}: {
+  children: React.ReactNode;
+  searchIndex: SearchEntry[];
+}) {
   const [cart, dispatch] = useReducer(cartReducer, EMPTY_CART);
   const [cartOpen, setCartOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const hydrated = useRef(false);
 
@@ -219,6 +230,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       wishlistCount: wishlist.length,
       toggleWishlist,
       isWishlisted: (slug: string) => wishlist.includes(slug),
+      searchIndex,
+      searchOpen,
+      setSearchOpen,
       toasts,
       pushToast,
       dismissToast,
@@ -236,6 +250,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       toasts,
       pushToast,
       dismissToast,
+      searchIndex,
+      searchOpen,
     ],
   );
 
