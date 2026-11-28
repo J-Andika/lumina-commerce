@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
+// The layout reads the catalogue for the search index, so nothing can be statically
+// generated at build time — the image has no database.
+export const dynamic = "force-dynamic";
+
 import { CartDrawer } from "@/components/cart-drawer";
 import { SearchDialog } from "@/components/search-dialog";
 import { StoreProvider } from "@/components/store-provider";
