@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { useStore } from "@/components/store-provider";
+import { WishlistButton } from "@/components/wishlist-button";
 import { formatMoney } from "@/lib/money";
 import { stockLabel, type VariantView } from "@/lib/product-view";
 
@@ -85,7 +86,10 @@ export function ProductDetail({
       </div>
 
       <div>
-        <p className="font-mono text-xs tracking-widest text-muted uppercase">Choose a variant</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-mono text-xs tracking-widest text-muted uppercase">Choose a variant</p>
+          <WishlistButton slug={productSlug} name={productName} />
+        </div>
 
         <fieldset className="mt-3">
           <legend className="sr-only">Variants of {productName}</legend>

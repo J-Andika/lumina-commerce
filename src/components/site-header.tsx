@@ -12,7 +12,7 @@ const NAV = [
 ];
 
 export function SiteHeader() {
-  const { itemCount, setCartOpen, wishlistCount } = useStore();
+  const { itemCount, setCartOpen, wishlistCount, setSearchOpen } = useStore();
 
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-background/85 backdrop-blur">
@@ -29,26 +29,22 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <form action="/shop" method="get" role="search" className="ml-auto hidden sm:block">
-          <label htmlFor="header-search" className="sr-only">
-            Search products
-          </label>
-          <input
-            id="header-search"
-            type="search"
-            name="q"
-            placeholder="Search"
-            className="h-9 w-40 border border-hairline bg-surface px-3 text-sm placeholder:text-muted focus:w-56 focus:outline-none md:w-56"
-          />
-        </form>
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          className="ml-auto hidden h-9 items-center gap-3 border border-hairline px-3 font-mono text-[11px] tracking-widest text-muted uppercase transition-colors hover:text-foreground sm:flex"
+        >
+          Search
+          <kbd className="border border-hairline px-1.5 py-0.5 text-[10px]">/</kbd>
+        </button>
 
         <div className="ml-auto flex items-center gap-2 sm:ml-0">
-          <span
-            title="Wishlist page lands in the next stage-6 slice"
-            className="hidden h-9 items-center gap-2 border border-hairline px-3 font-mono text-[11px] tracking-widest text-muted uppercase sm:flex"
+          <Link
+            href="/wishlist"
+            className="hidden h-9 items-center gap-2 border border-hairline px-3 font-mono text-[11px] tracking-widest text-muted uppercase transition-colors hover:text-foreground sm:flex"
           >
             Wishlist <span className={wishlistCount > 0 ? "text-accent" : ""}>{wishlistCount}</span>
-          </span>
+          </Link>
 
           <button
             type="button"
