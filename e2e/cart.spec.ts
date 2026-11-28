@@ -42,3 +42,21 @@ test("removes a line and restores it with undo", async ({ page }) => {
   await cartButton.click();
   await expect(page.getByRole("dialog")).toContainText("Halo");
 });
+
+test("applies a promo, shows the discount, and rejects an unknown code", async ({ page }) => {
+  await page.goto("/product/monolith");
+  await page.getByRole("button", { name: /add to cart/i }).click();
+
+  const drawer = page.getByRole("dialog");
+  await expect(drawer).toContainText("Free shipping unlocked");
+
+  await page.getByLabel("Promo code").fill("diskon10");
+  await page.getByRole("button", { name: /^apply$/i }).click();
+
+  await expect(drawer).toContainText("10% off");
+  await expect(drawer).toContainText("$34.90");
+
+  await page.getByLabel("Promo code").fill("NOPE");
+  await page.getByRole("button", { name: /^apply$/i }).click();
+  await expect(drawer).toContainText("does not exist");
+});
