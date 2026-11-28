@@ -3,19 +3,28 @@
 import Image from "next/image";
 import { useState } from "react";
 
+import { useStore } from "@/components/store-provider";
 import { formatMoney } from "@/lib/money";
 import { stockLabel, type VariantView } from "@/lib/product-view";
 
 type GalleryImage = { id: string; url: string; alt: string };
 
 type Props = {
+  productSlug: string;
   productName: string;
   images: GalleryImage[];
   variants: VariantView[];
   initialVariantId: string | null;
 };
 
-export function ProductDetail({ productName, images, variants, initialVariantId }: Props) {
+export function ProductDetail({
+  productSlug,
+  productName,
+  images,
+  variants,
+  initialVariantId,
+}: Props) {
+  const { addItem } = useStore();
   const [activeImageId, setActiveImageId] = useState(images[0]?.id ?? null);
   const [selectedId, setSelectedId] = useState(initialVariantId);
 
@@ -130,11 +139,25 @@ export function ProductDetail({ productName, images, variants, initialVariantId 
 
         <button
           type="button"
-          disabled
-          title="Add to cart lands in stage 6"
-          className="mt-6 w-full cursor-not-allowed border border-hairline bg-surface px-5 py-3 font-mono text-xs tracking-widest text-muted uppercase"
+          disabled={!selected || selected.stock === 0}
+          onClick={() => {
+            if (!selected) return;
+            addItem(
+              {
+                variantId: selected.id,
+                productSlug,
+                productName,
+                variantName: selected.name,
+                unitPriceCents: selected.priceCents,
+                stock: selected.stock,
+                imageUrl: images[0]?.url,
+              },
+              1,
+            );
+          }}
+          className="mt-6 w-full border border-accent bg-accent px-5 py-3 font-mono text-xs tracking-widest text-accent-foreground uppercase transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:border-hairline disabled:bg-surface disabled:text-muted"
         >
-          Add to cart — stage 6
+          {selected && selected.stock === 0 ? "Sold out" : "Add to cart"}
         </button>
       </div>
     </div>

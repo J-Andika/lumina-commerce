@@ -121,6 +121,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         </div>
 
         <ProductDetail
+          productSlug={product.slug}
           productName={product.name}
           images={product.images.map((image) => ({ id: image.id, url: image.url, alt: image.alt }))}
           variants={variants}
