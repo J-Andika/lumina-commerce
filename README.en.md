@@ -8,7 +8,7 @@ A production-shaped headless commerce storefront: a Next.js App Router frontend 
 purpose-built commerce API (Route Handlers + Prisma), with real Stripe test-mode checkout,
 persistent orders, and an operational admin.
 
-> **Status:** stage 8 of 11 complete — authenticated admin for orders and stock (166 unit tests, 9 E2E).
+> **Status:** stage 9 of 11 complete — QA gates: 14 E2E in CI, axe clean, Lighthouse 99–100 (173 unit tests).
 > Sandbox preview (ephemeral): <https://3000-001m7ma0xxphbkbh4k9qkh2a3x1.sbx.sandboxes-cloud.docker.com>
 > — it may be offline when the sandbox is stopped; the permanent link lands in stage 10.
 

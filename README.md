@@ -8,7 +8,7 @@ Storefront headless dengan bentuk produksi: frontend Next.js App Router yang ber
 commerce API buatan sendiri (Route Handlers + Prisma), checkout Stripe test mode yang benar-benar
 jalan, order tersimpan di database, dan admin yang bisa dipakai.
 
-> **Status:** tahap 8 dari 11 selesai (admin: GMV, order, stok).
+> **Status:** tahap 9 dari 11 selesai (QA gate: E2E di CI, axe, budget performa).
 > Preview sandbox (ephemeral): <https://3000-001m7ma0xxphbkbh4k9qkh2a3x1.sbx.sandboxes-cloud.docker.com>
 > — bisa mati kalau sandbox di-stop. Link permanen menyusul di tahap 10.
 

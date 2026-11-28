@@ -3,7 +3,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useStore } from "@/components/store-provider";
 import { formatMoney } from "@/lib/money";
@@ -16,30 +16,6 @@ export function SearchDialog() {
   const router = useRouter();
 
   const results = filterSearchIndex(searchIndex, query);
-
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-      const typing = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
-
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setSearchOpen(true);
-        return;
-      }
-
-      // Chrome reserves ⌘K/Ctrl+K for its own search bar, so "/" is the shortcut
-      // that actually reaches the page in every browser.
-      if (event.key === "/" && !typing) {
-        event.preventDefault();
-        setSearchOpen(true);
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [setSearchOpen]);
 
   function go(slug: string) {
     setSearchOpen(false);
