@@ -47,15 +47,26 @@ fi
 echo "==> build app"
 docker build --target runner -t "$IMAGE" "$APP_DIR"
 
-echo "==> build migrator"
-docker build --target migrator -t "${IMAGE%:*}-migrator:latest" "$APP_DIR"
-
 echo "==> migrate + seed"
-docker run --rm \
-  -v "${VOLUME}:/data" \
-  --env-file "$ENV_FILE" \
-  "${IMAGE%:*}-migrator:latest" \
-  sh -lc "npx prisma migrate deploy && npx tsx prisma/seed.ts && chown -R 1001:1001 /data && chmod -R u+rwX,g+rwX /data"
+MIGRATOR_IMAGE="${IMAGE%:*}-migrator:latest"
+STAMP_FILE="$(dirname "$ENV_FILE")/.migrate-stamp"
+STAMP="$(
+  cd "$APP_DIR"
+  { cat prisma/schema.prisma; find prisma/migrations prisma/seed.ts -type f | sort | xargs cat; } \
+    | sha256sum | cut -c1-16
+)"
+
+if [ "$(cat "$STAMP_FILE" 2>/dev/null || true)" = "$STAMP" ]; then
+  echo "schema, migrations, and seed unchanged ($STAMP); reusing the migrator image"
+else
+  docker build --target migrator -t "$MIGRATOR_IMAGE" "$APP_DIR"
+  docker run --rm \
+    -v "${VOLUME}:/data" \
+    --env-file "$ENV_FILE" \
+    "$MIGRATOR_IMAGE" \
+    sh -lc "npx prisma migrate deploy && npx tsx prisma/seed.ts && chown -R 1001:1001 /data && chmod -R u+rwX,g+rwX /data"
+  echo "$STAMP" > "$STAMP_FILE"
+fi
 
 echo "==> restart"
 docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
