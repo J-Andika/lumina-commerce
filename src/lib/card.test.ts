@@ -38,8 +38,12 @@ describe("checkExpiry", () => {
     expect(checkExpiry("12/27", now).valid).toBe(true);
   });
 
-  it("rejects the current month", () => {
-    expect(checkExpiry("06/26", now).valid).toBe(false);
+  it("accepts the current month, which is valid through month end", () => {
+    expect(checkExpiry("06/26", now).valid).toBe(true);
+  });
+
+  it("rejects a month that has passed", () => {
+    expect(checkExpiry("05/26", now).valid).toBe(false);
   });
 
   it("rejects a malformed value", () => {
