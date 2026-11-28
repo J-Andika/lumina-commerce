@@ -10,6 +10,9 @@ export default defineConfig({
       DATABASE_URL: "file:./prisma/test.db",
     },
     testTimeout: 20_000,
+    // One shared SQLite test database: run files sequentially so order tests cannot
+    // race catalogue assertions.
+    fileParallelism: false,
     hookTimeout: 60_000,
   },
   resolve: {
