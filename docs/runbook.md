@@ -40,6 +40,10 @@ container, and fails the deploy if `/api/health` does not answer within 60 s.
 
 Same command. The script is idempotent: fetch, hard reset, rebuild, migrate, restart, health.
 
+Measured on the host: **89–93 s** when the schema, migrations, and seed file are unchanged
+(the migrator image is reused and `migrate deploy` is skipped); about **6–8 min** when a
+migration is present, because the migrator stage rebuilds and runs.
+
 ```bash
 cd /opt/lumina && APP_DIR=/opt/lumina ENV_FILE=/opt/lumina/lumina.env   BIND=127.0.0.1 PORT=3010 CONTAINER=lumina-prod VOLUME=lumina-data bash scripts/deploy.sh
 ```
