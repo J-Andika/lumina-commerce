@@ -8,7 +8,7 @@ A production-shaped headless commerce storefront: a Next.js App Router frontend 
 purpose-built commerce API (Route Handlers + Prisma), with real Stripe test-mode checkout,
 persistent orders, and an operational admin.
 
-> **Status:** stage 5 of 11 complete — interactive product page with structured data and per-product OG images (118 tests).
+> **Status:** stage 6 of 11 complete — cart drawer, promo codes, wishlist, quick search (125 unit tests, 5 E2E).
 > Sandbox preview (ephemeral): <https://3000-001m7ma0xxphbkbh4k9qkh2a3x1.sbx.sandboxes-cloud.docker.com>
 > — it may be offline when the sandbox is stopped; the permanent link lands in stage 10.
 
@@ -77,7 +77,7 @@ In short: `main` is always buildable, every change goes through a PR, CI must be
 - [x] Stage 3 — pricing / promo / cart domain + unit tests (82 tests)
 - [x] Stage 4 — storefront, /shop with URL-state filtering, product page shell
 - [x] Stage 5 — interactive product page, JSON-LD, OG images, sitemap
-- [ ] Stage 6 — cart drawer, promo engine, wishlist, search
+- [x] Stage 6 — cart drawer, promo codes, wishlist, quick search
 - [ ] Stage 7 — checkout, Stripe test mode, receipt
 - [ ] Stage 8 — admin (Basic Auth), stock + order actions
 - [ ] Stage 9 — E2E, a11y, performance budget
