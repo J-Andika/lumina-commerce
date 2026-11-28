@@ -6,8 +6,7 @@ import "./globals.css";
 // generated at build time — the image has no database.
 export const dynamic = "force-dynamic";
 
-import { CartDrawer } from "@/components/cart-drawer";
-import { SearchDialog } from "@/components/search-dialog";
+import { Overlays } from "@/components/overlays";
 import { StoreProvider } from "@/components/store-provider";
 import { Toaster } from "@/components/toaster";
 import { listProducts } from "@/server/catalog";
@@ -26,6 +25,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
     default: "Lumina Commerce",
     template: "%s · Lumina Commerce",
@@ -55,8 +55,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={`${inter.variable} ${instrumentSerif.variable}`}>
         <StoreProvider searchIndex={searchIndex}>
           {children}
-          <CartDrawer />
-          <SearchDialog />
+          <Overlays />
           <Toaster />
         </StoreProvider>
       </body>
