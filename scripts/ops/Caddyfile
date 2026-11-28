@@ -1,0 +1,12 @@
+# Replace the hostname with your own; this one is sslip.io, which resolves to the IP
+# in the name, so Let's Encrypt can issue a certificate without owning a domain.
+95-111-212-87.sslip.io {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:3010
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}

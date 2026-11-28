@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Runs INSIDE the sandbox. Pulls latest main, rebuilds the image, restarts the container.
 # Usage: bash scripts/deploy.sh
+#   BIND=127.0.0.1 keeps the port on localhost for a reverse proxy in front.
 set -euo pipefail
 
 APP_DIR="${APP_DIR:-$HOME/lumina-commerce}"
 IMAGE="${IMAGE:-lumina-commerce:latest}"
 CONTAINER="${CONTAINER:-lumina-demo}"
 PORT="${PORT:-3000}"
+BIND="${BIND:-0.0.0.0}"
 ENV_FILE="${ENV_FILE:-$HOME/lumina.env}"
 VOLUME="${VOLUME:-lumina-data}"
 
@@ -53,14 +55,14 @@ docker run --rm \
   -v "${VOLUME}:/data" \
   --env-file "$ENV_FILE" \
   "${IMAGE%:*}-migrator:latest" \
-  sh -lc "npx prisma migrate deploy && npx tsx prisma/seed.ts"
+  sh -lc "npx prisma migrate deploy && npx tsx prisma/seed.ts && chown -R 1001:1001 /data && chmod -R u+rwX,g+rwX /data"
 
 echo "==> restart"
 docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
 docker run -d \
   --name "$CONTAINER" \
   --restart unless-stopped \
-  -p "${PORT}:3000" \
+  -p "${BIND}:${PORT}:3000" \
   -v "${VOLUME}:/data" \
   --env-file "$ENV_FILE" \
   "$IMAGE"
