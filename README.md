@@ -8,7 +8,7 @@ Storefront headless dengan bentuk produksi: frontend Next.js App Router yang ber
 commerce API buatan sendiri (Route Handlers + Prisma), checkout Stripe test mode yang benar-benar
 jalan, order tersimpan di database, dan admin yang bisa dipakai.
 
-> **Status:** tahap 10 dari 11 selesai — live di https://95-111-212-87.sslip.io (Caddy + TLS, backup harian, runbook).
+> **Status:** tahap 10 dari 11 selesai — **live di https://95-111-212-87.sslip.io** (Caddy + TLS, backup harian, runbook).
 > Preview sandbox (ephemeral): <https://3000-001m7ma0xxphbkbh4k9qkh2a3x1.sbx.sandboxes-cloud.docker.com>
 > — bisa mati kalau sandbox di-stop. Link permanen menyusul di tahap 10.
 
