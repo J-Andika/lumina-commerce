@@ -36,6 +36,7 @@ type StoreValue = {
   setQty: (variantId: string, qty: number) => void;
   removeItem: (variantId: string) => void;
   clearCart: () => void;
+  setPromoCode: (code: string | null) => void;
   cartOpen: boolean;
   setCartOpen: (open: boolean) => void;
   wishlist: string[];
@@ -188,6 +189,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = useCallback(() => dispatch({ type: "clear" }), []);
 
+  const setPromoCode = useCallback((code: string | null) => {
+    if (code) {
+      dispatch({ type: "setPromo", code });
+    } else {
+      dispatch({ type: "clearPromo" });
+    }
+  }, []);
+
   const toggleWishlist = useCallback((slug: string) => {
     const current = getWishlistSnapshot();
     writeWishlist(
@@ -203,6 +212,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setQty,
       removeItem,
       clearCart,
+      setPromoCode,
       cartOpen,
       setCartOpen,
       wishlist,
@@ -219,6 +229,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setQty,
       removeItem,
       clearCart,
+      setPromoCode,
       cartOpen,
       wishlist,
       toggleWishlist,
