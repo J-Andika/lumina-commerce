@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useStore } from "@/components/store-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV = [
@@ -9,6 +12,8 @@ const NAV = [
 ];
 
 export function SiteHeader() {
+  const { itemCount, setCartOpen, wishlistCount } = useStore();
+
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-5 px-4 sm:px-6">
@@ -39,19 +44,21 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-2 sm:ml-0">
           <span
-            aria-disabled="true"
-            title="Wishlist lands in stage 6"
-            className="hidden h-9 items-center border border-hairline px-3 font-mono text-[11px] tracking-widest text-muted uppercase sm:flex"
+            title="Wishlist page lands in the next stage-6 slice"
+            className="hidden h-9 items-center gap-2 border border-hairline px-3 font-mono text-[11px] tracking-widest text-muted uppercase sm:flex"
           >
-            Wishlist
+            Wishlist <span className={wishlistCount > 0 ? "text-accent" : ""}>{wishlistCount}</span>
           </span>
-          <span
-            aria-disabled="true"
-            title="Cart drawer lands in stage 6"
-            className="flex h-9 items-center gap-2 border border-hairline px-3 font-mono text-[11px] tracking-widest text-muted uppercase"
+
+          <button
+            type="button"
+            onClick={() => setCartOpen(true)}
+            aria-label={`Open cart, ${itemCount} items`}
+            className="flex h-9 items-center gap-2 border border-hairline px-3 font-mono text-[11px] tracking-widest text-muted uppercase transition-colors hover:text-foreground"
           >
-            Cart <span className="text-accent">0</span>
-          </span>
+            Cart <span className={itemCount > 0 ? "text-accent" : ""}>{itemCount}</span>
+          </button>
+
           <ThemeToggle />
         </div>
       </div>
